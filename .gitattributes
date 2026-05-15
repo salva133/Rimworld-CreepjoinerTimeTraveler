@@ -1,2 +1,44 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Default: auto-detect line endings, normalize to LF in the repo
+* text=auto eol=lf
+
+# --- Source / configuration ---
+*.cs       text diff=csharp
+*.csproj   text
+*.sln      text eol=crlf
+*.props    text
+*.targets  text
+*.config   text
+*.xml      text
+*.md       text
+*.json     text
+*.yml      text
+*.yaml     text
+*.txt      text
+
+# --- Windows scripts: force CRLF, otherwise cmd.exe complains ---
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
+*.ps1      text eol=crlf
+
+# --- Shell scripts: force LF ---
+*.sh       text eol=lf
+
+# --- Binary files (RimWorld mod assets) ---
+*.dll      binary
+*.pdb      binary
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.bmp      binary
+*.tga      binary
+*.psd      binary
+*.ico      binary
+*.wav      binary
+*.mp3      binary
+*.ogg      binary
+*.zip      binary
+*.7z       binary
+
+# --- GitHub: keep generated/build artifacts out of the "Languages" bar ---
+1.6/Assemblies/* linguist-generated=true

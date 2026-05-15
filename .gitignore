@@ -1,0 +1,67 @@
+# =========================================================
+# RimWorld Mod: CreepjoinerTimeTraveler
+# =========================================================
+
+# ---- Visual Studio / Rider / VS Code ----
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.swp
+*~
+
+# ---- .NET / MSBuild output ----
+bin/
+obj/
+*.pdb
+*.mdb
+*.cache
+*.log
+*.binlog
+
+# Do NOT ignore the compiled assembly - the mod build lands in
+# 1.6/Assemblies/CreepjoinerTimeTraveler.dll and must be committed
+# (or shipped in the release zip), otherwise RimWorld won't load the mod.
+!1.6/Assemblies/*.dll
+
+# ---- NuGet ----
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# ---- ReSharper / Rider ----
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# ---- OS junk ----
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ---- Local test / backup files ----
+*.bak
+*.tmp
+*.orig
+*.rej
+*.local
+TODO.local.md
+NOTES.local.md
+
+# ---- Release artifacts (should live outside the repo) ----
+/dist/
+/release/
+*.zip
