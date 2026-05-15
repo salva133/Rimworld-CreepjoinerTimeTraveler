@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!--
+    Eigener Creep-Joiner-Formtyp.
+
+    Die Felder von CreepJoinerFormKindDef koennen sich zwischen Anomaly-Versionen
+    leicht aendern. Diese Konfiguration nutzt nur die zuverlaessig vorhandenen
+    Basis-Felder; der Rest (Aussehen-Override etc.) passiert im C#-Patch.
+  -->
+  <CreepJoinerFormKindDef>
+    <defName>CTT_TimeTraveler</defName>
+    <label>time traveler</label>
+    <description>A drifter in strange, ageing gear. There is something unsettlingly familiar about them - old scars and augmentations that you swear you have seen before. They claim to come from far away. They are quiet, withdrawn, and ask to stay a while.</description>
+    <weight>1.0</weight>
+    <modExtensions>
+      <li Class="CreepjoinerTimeTraveler.DefModExtension_TimeTraveler">
+        <minAgeOffsetYears>20</minAgeOffsetYears>
+        <maxAgeOffsetYears>30</maxAgeOffsetYears>
+        <visitDurationDays>30</visitDurationDays>
+        <minTechLevel>Industrial</minTechLevel>
+      </li>
+    </modExtensions>
+  </CreepJoinerFormKindDef>
+
+</Defs>

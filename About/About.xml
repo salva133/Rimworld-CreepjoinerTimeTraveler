@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Creep Joiner: Time Traveler</name>
+  <packageId>steve.creepjoinertimetraveler</packageId>
+  <author>Steve</author>
+  <url></url>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>Fuegt einen Creep-Joiner-Typ hinzu: einen Zeitreisenden, der heimlich eine 20-30 Jahre aeltere Kopie eines deiner aktuellen Kolonisten ist. Er teilt Narben und Augmentationen mit seinem juengeren Ich, traegt zufaellige Hightech-Ausruestung, hat einen zufaelligen Namen und bleibt 30 Tage, bevor er die Kolonie wieder verlaesst. Er ist harmlos - der Spieler erkennt nur an gemeinsamen Narben und Bionics, wer er einmal war.
+
+Benoetigt das Anomaly-DLC fuer das Creep-Joiner-System.</description>
+  <modDependencies>
+    <li>
+      <packageId>Ludeon.RimWorld.Anomaly</packageId>
+      <displayName>Anomaly</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2380740</steamWorkshopUrl>
+    </li>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>Ludeon.RimWorld</li>
+    <li>Ludeon.RimWorld.Royalty</li>
+    <li>Ludeon.RimWorld.Ideology</li>
+    <li>Ludeon.RimWorld.Biotech</li>
+    <li>Ludeon.RimWorld.Anomaly</li>
+    <li>brrainz.harmony</li>
+  </loadAfter>
+</ModMetaData>
