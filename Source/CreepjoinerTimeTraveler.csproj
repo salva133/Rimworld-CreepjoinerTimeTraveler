@@ -15,11 +15,11 @@
   </PropertyGroup>
 
   <!--
-    Referenz-Assemblies via NuGet:
-      - Krafs.Rimworld.Ref:  RimWorld + Unity Refs (alle DLCs inkl. Anomaly drin)
-      - Lib.Harmony:         0Harmony.dll (ExcludeAssets=runtime, weil Harmony als Mod separat geladen wird)
+    Reference assemblies via NuGet:
+      - Krafs.Rimworld.Ref:  RimWorld + Unity refs (all DLCs including Anomaly bundled)
+      - Lib.Harmony:         0Harmony.dll (ExcludeAssets=runtime, because Harmony is loaded separately as a mod)
 
-    NuGet erforderlich. Build via:   dotnet build -c Release
+    NuGet required. Build via:   dotnet build -c Release
   -->
   <ItemGroup>
     <PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.*" PrivateAssets="all" ExcludeAssets="runtime" />
