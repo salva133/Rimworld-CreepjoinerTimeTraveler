@@ -166,5 +166,5 @@ exactly where RimWorld expects it.
 
 ## License / Author
 
-Author: **Steve**
-PackageId: `steve.creepjoinertimetraveler`
+Author: **DonSantana**
+PackageId: `donsantana.creepjoiners.timetraveler`
