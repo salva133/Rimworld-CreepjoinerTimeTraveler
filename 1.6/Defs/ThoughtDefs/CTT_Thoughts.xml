@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!--
+    Situational social thought. Active for the (traveler -> source) pair
+    only - the ThoughtWorker reads the binding off the traveler's
+    CTT_TimeTravelerVisit hediff, so the reverse direction (source -> traveler)
+    is never active.
+
+    Subtle label, no explicit hint at the time-travel mechanic.
+  -->
+  <ThoughtDef>
+    <defName>CTT_FamiliarSomehow</defName>
+    <workerClass>CreepjoinerTimeTraveler.ThoughtWorker_TimeTravelerSource</workerClass>
+    <thoughtClass>Thought_SituationalSocial</thoughtClass>
+    <stages>
+      <li>
+        <label>familiar somehow</label>
+        <description>I don't know why, but I'd trust them with my life.</description>
+        <baseOpinionOffset>30</baseOpinionOffset>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+</Defs>

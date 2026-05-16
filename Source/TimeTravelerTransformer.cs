@@ -103,8 +103,9 @@ namespace CreepjoinerTimeTraveler
             ReplaceApparelHightech(pawn, ext.minTechLevel);
             ReplaceWeapon(pawn, ext.minTechLevel);
 
-            // 13) Visit timer.
-            AttachVisitTimer(pawn, ext);
+            // 13) Visit timer + source binding + familiar relation.
+            AttachVisitTimer(pawn, template, ext);
+            AddFamiliarRelation(pawn, template);
 
             // 14) Refresh visuals after everything has been written.
             RefreshVisuals(pawn);
@@ -487,7 +488,7 @@ namespace CreepjoinerTimeTraveler
 
         // ---------- Timer ----------
 
-        private static void AttachVisitTimer(Pawn pawn, DefModExtension_TimeTraveler ext)
+        private static void AttachVisitTimer(Pawn pawn, Pawn template, DefModExtension_TimeTraveler ext)
         {
             var def = DefDatabase<HediffDef>.GetNamedSilentFail("CTT_TimeTravelerVisit");
             if (def == null) return;
@@ -495,11 +496,42 @@ namespace CreepjoinerTimeTraveler
             var hediff = HediffMaker.MakeHediff(def, pawn);
             pawn.health.AddHediff(hediff);
 
-            // If the def-defined duration should be overridden, adjust here.
-            var comp = hediff.TryGetComp<HediffComp_LeaveAfterTicks>();
-            if (comp != null && ext.visitDurationDays > 0)
+            // Override the def-defined leave timer from the mod extension.
+            var timer = hediff.TryGetComp<HediffComp_LeaveAfterTicks>();
+            if (timer != null && ext.visitDurationDays > 0)
             {
-                Traverse.Create(comp).Field("ticksLeft").SetValue(ext.visitDurationDays * 60000);
+                Traverse.Create(timer).Field("ticksLeft").SetValue(ext.visitDurationDays * 60000);
+            }
+
+            // Bind the source pawn so the comp can collapse the traveler
+            // when the source dies. Both lifetime mechanics (leave timer +
+            // source binding) live on the same hediff for save/load and
+            // dedupe simplicity.
+            var bound = hediff.TryGetComp<HediffComp_BoundToSource>();
+            bound?.Bind(template);
+        }
+
+        // ---------- Familiar relation ----------
+        //
+        // Symmetric "familiar" relation visible on the social tab of both
+        // pawns. Intentionally vague label - the player should notice the
+        // resemblance themselves, not be told.
+
+        private static void AddFamiliarRelation(Pawn pawn, Pawn template)
+        {
+            if (pawn?.relations == null || template == null) return;
+
+            var def = DefDatabase<PawnRelationDef>.GetNamedSilentFail("CTT_Familiar");
+            if (def == null) return;
+
+            try
+            {
+                if (!pawn.relations.DirectRelationExists(def, template))
+                    pawn.relations.AddDirectRelation(def, template);
+            }
+            catch (System.Exception ex)
+            {
+                Log.Warning($"[CreepjoinerTimeTraveler] failed to add familiar relation: {ex.Message}");
             }
         }
 

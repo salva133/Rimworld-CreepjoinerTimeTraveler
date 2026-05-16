@@ -21,6 +21,9 @@
       <li Class="CreepjoinerTimeTraveler.HediffCompProperties_LeaveAfterTicks">
         <leaveAfterTicks>1800000</leaveAfterTicks> <!-- 30 days * 60000 ticks -->
       </li>
+      <!-- Causality binding: tracks the source colonist and collapses
+           the traveler shortly after the source dies. -->
+      <li Class="CreepjoinerTimeTraveler.HediffCompProperties_BoundToSource" />
     </comps>
   </HediffDef>
 

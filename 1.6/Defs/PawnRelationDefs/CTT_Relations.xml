@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!--
+    Symmetric, low-importance relation tag attached to both the traveler
+    and his source. Label intentionally vague - "familiar" should read as
+    a quiet hint rather than an explanation. Self-inverse, like the
+    vanilla cousin relation.
+
+    No procedural generation worker - the relation is added directly by
+    TimeTravelerTransformer when the traveler is bound to a source.
+  -->
+  <PawnRelationDef>
+    <defName>CTT_Familiar</defName>
+    <label>familiar</label>
+    <labelFemale>familiar</labelFemale>
+    <inverse>CTT_Familiar</inverse>
+    <importance>5</importance>
+  </PawnRelationDef>
+
+</Defs>
