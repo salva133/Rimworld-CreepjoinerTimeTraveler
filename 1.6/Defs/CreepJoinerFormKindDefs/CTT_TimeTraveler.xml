@@ -13,6 +13,8 @@
     <label>time traveler</label>
     <description>A drifter in strange, ageing gear. There is something unsettlingly familiar about them - old scars and augmentations that you swear you have seen before. They claim to come from far away. They are quiet, withdrawn, and ask to stay a while.</description>
     <weight>1.0</weight>
+    <letterLabel>A weathered drifter in strange, ageing gear approaches your colony.</letterLabel>
+    <letterPrompt>The drifter walks with the unhurried gait of someone who already knows the way. {PAWN_pronoun} carries gear that looks both familiar and impossibly old - scuffed, hand-mended, decades past its prime. {PAWN_possessive} eyes settle on one of your colonists for a moment too long, as though recognising a face long mourned.\n\n{PAWN_pronoun} asks only for shelter, and to be allowed to stay a while. {PAWN_pronoun} will not say where {PAWN_pronoun} came from.</letterPrompt>
     <modExtensions>
       <li Class="CreepjoinerTimeTraveler.DefModExtension_TimeTraveler">
         <minAgeOffsetYears>20</minAgeOffsetYears>
