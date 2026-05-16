@@ -8,21 +8,21 @@ using Verse;
 namespace CreepjoinerTimeTraveler
 {
     /// <summary>
-    /// Reagiert auf das vanilla Creep-Joiner-Incident.
+    /// Reacts to the vanilla creep-joiner incident.
     ///
     /// Pipeline:
-    ///   1. IncidentWorker_CreepJoinerJoin.TryExecuteWorker startet.
-    ///   2. PawnGenerator.GeneratePawn erzeugt einen rohen CreepJoiner-Pawn -
-    ///      die Form auf CompCreepJoiner ist hier noch nicht gesetzt.
-    ///   3. Der Worker waehlt die Form gewichtet aus und schreibt sie auf den
-    ///      Comp.
-    ///   4. Der Worker spawnt den Pawn auf der Zielkarte und feuert die Letter.
-    ///   5. Unser Postfix laeuft - jetzt ist alles initialisiert und wir
-    ///      finden den frischen CTT_TimeTraveler auf der Karte.
+    ///   1. IncidentWorker_CreepJoinerJoin.TryExecuteWorker starts.
+    ///   2. PawnGenerator.GeneratePawn produces a raw creep-joiner pawn -
+    ///      the form on CompCreepJoiner is not yet set at this point.
+    ///   3. The worker picks the form by weight and writes it onto the
+    ///      comp.
+    ///   4. The worker spawns the pawn on the target map and fires the letter.
+    ///   5. Our postfix runs - by now everything is initialized and we
+    ///      find the fresh CTT_TimeTraveler on the map.
     ///
-    /// Patch ist dynamisch installiert, weil RimWorld.IncidentWorker_CreepJoinerJoin
-    /// im Krafs-Ref-Assembly nicht garantiert oeffentlich ist. AccessTools.TypeByName
-    /// haengt sich gegen den realen Anomaly-Assembly-Typ.
+    /// The patch is installed dynamically because RimWorld.IncidentWorker_CreepJoinerJoin
+    /// is not guaranteed to be public in the Krafs ref assembly. AccessTools.TypeByName
+    /// binds against the real Anomaly assembly type.
     /// </summary>
     public static class Patch_IncidentWorker_CreepJoinerJoin
     {
@@ -55,8 +55,8 @@ namespace CreepjoinerTimeTraveler
 
             var visitDef = DefDatabase<HediffDef>.GetNamedSilentFail("CTT_TimeTravelerVisit");
 
-            // Finde den juengsten, noch-nicht-transformierten CTT-Joiner auf
-            // der Zielkarte. Marker "schon transformiert" = Visit-Hediff bereits da.
+            // Find the youngest, not-yet-transformed CTT joiner on the
+            // target map. Marker "already transformed" = visit hediff already present.
             foreach (var pawn in map.mapPawns.AllPawnsSpawned)
             {
                 try
