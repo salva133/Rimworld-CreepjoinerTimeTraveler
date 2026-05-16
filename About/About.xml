@@ -7,9 +7,9 @@
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Fuegt einen Creep-Joiner-Typ hinzu: einen Zeitreisenden, der heimlich eine 20-30 Jahre aeltere Kopie eines deiner aktuellen Kolonisten ist. Er teilt Narben und Augmentationen mit seinem juengeren Ich, traegt zufaellige Hightech-Ausruestung, hat einen zufaelligen Namen und bleibt 30 Tage, bevor er die Kolonie wieder verlaesst. Er ist harmlos - der Spieler erkennt nur an gemeinsamen Narben und Bionics, wer er einmal war.
+  <description>Adds a new creep-joiner form: a time traveler who is secretly a 20-30 year older copy of one of your current colonists. He shares scars and augmentations with his younger self, wears random high-tech gear, has a randomized name and stays for 30 days before he leaves the colony again. He is harmless - the player only recognizes who he once was through the shared scars and bionics.
 
-Benoetigt das Anomaly-DLC fuer das Creep-Joiner-System.</description>
+Requires the Anomaly DLC for the creep-joiner system.</description>
   <modDependencies>
     <li>
       <packageId>Ludeon.RimWorld.Anomaly</packageId>

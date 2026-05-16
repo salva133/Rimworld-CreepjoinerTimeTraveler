@@ -4,7 +4,7 @@ using Verse;
 namespace CreepjoinerTimeTraveler
 {
     /// <summary>
-    /// An die CreepJoinerFormKindDef gehaengte Konfiguration des Zeitreisenden.
+    /// Time-traveler configuration attached to the CreepJoinerFormKindDef.
     /// </summary>
     public class DefModExtension_TimeTraveler : DefModExtension
     {

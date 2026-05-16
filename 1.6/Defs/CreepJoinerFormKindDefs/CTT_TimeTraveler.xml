@@ -2,11 +2,11 @@
 <Defs>
 
   <!--
-    Eigener Creep-Joiner-Formtyp.
+    Custom creep-joiner form type.
 
-    Die Felder von CreepJoinerFormKindDef koennen sich zwischen Anomaly-Versionen
-    leicht aendern. Diese Konfiguration nutzt nur die zuverlaessig vorhandenen
-    Basis-Felder; der Rest (Aussehen-Override etc.) passiert im C#-Patch.
+    The fields on CreepJoinerFormKindDef can shift slightly between Anomaly
+    versions. This config only uses the reliably present base fields; the rest
+    (appearance override etc.) happens inside the C# patch.
   -->
   <CreepJoinerFormKindDef>
     <defName>CTT_TimeTraveler</defName>

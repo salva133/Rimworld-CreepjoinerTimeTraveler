@@ -7,9 +7,9 @@ using Verse;
 namespace CreepjoinerTimeTraveler
 {
     /// <summary>
-    /// Greift nach Abschluss von PawnGenerator.GeneratePawn ein.
-    /// Wenn der gerade erzeugte Pawn ein Creep-Joiner mit unserer
-    /// Form "CTT_TimeTraveler" ist, transformieren wir ihn.
+    /// Hooks in after PawnGenerator.GeneratePawn completes.
+    /// If the freshly generated pawn is a creep-joiner with our
+    /// "CTT_TimeTraveler" form, we transform him.
     /// </summary>
     [HarmonyPatch(typeof(PawnGenerator), nameof(PawnGenerator.GeneratePawn),
                   new[] { typeof(PawnGenerationRequest) })]
@@ -35,10 +35,10 @@ namespace CreepjoinerTimeTraveler
         }
 
         /// <summary>
-        /// Holt - moeglichst version-tolerant - die CreepJoinerFormKindDef vom Pawn.
-        /// Anomaly hat einen ThingComp "CompCreepJoiner" mit einem Feld/Property
-        /// vom Typ CreepJoinerFormKindDef. Wir suchen reflektiv, damit kleinere
-        /// API-Aenderungen zwischen 1.5/1.6 nicht alles brechen.
+        /// Grabs the CreepJoinerFormKindDef from the pawn as version-tolerantly
+        /// as possible. Anomaly has a ThingComp "CompCreepJoiner" with a field
+        /// or property of type CreepJoinerFormKindDef. We search reflectively
+        /// so small API shifts between 1.5/1.6 don't break everything.
         /// </summary>
         private static CreepJoinerFormKindDef TryGetCreepJoinerForm(Pawn pawn)
         {

@@ -2,8 +2,8 @@
 <Defs>
 
   <!--
-    Unsichtbarer Hediff, der nur als Marker und Timer dient.
-    Nach Ablauf laesst der HediffComp den Pawn die Karte verlassen.
+    Invisible hediff that only acts as a marker and timer.
+    When it expires, the HediffComp makes the pawn leave the map.
   -->
   <HediffDef>
     <defName>CTT_TimeTravelerVisit</defName>
@@ -19,7 +19,7 @@
     </stages>
     <comps>
       <li Class="CreepjoinerTimeTraveler.HediffCompProperties_LeaveAfterTicks">
-        <leaveAfterTicks>1800000</leaveAfterTicks> <!-- 30 Tage * 60000 ticks -->
+        <leaveAfterTicks>1800000</leaveAfterTicks> <!-- 30 days * 60000 ticks -->
       </li>
     </comps>
   </HediffDef>

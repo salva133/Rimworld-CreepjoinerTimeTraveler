@@ -41,7 +41,7 @@ form, the freshly generated pawn is rebuilt in a postfix on
   When it expires (default: **30 days**, 1,800,000 ticks) the pawn is dropped
   from the player faction and pathed to the nearest reachable map-edge cell to
   leave the map on his own. A message
-  `"<Name> verlaesst die Kolonie - so still wie er gekommen ist."` notifies
+  `"<Name> leaves the colony - as quietly as he arrived."` notifies
   the player.
 
 The time traveler is **mechanically harmless** - he doesn't attack and carries

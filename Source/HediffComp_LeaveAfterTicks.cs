@@ -6,7 +6,7 @@ namespace CreepjoinerTimeTraveler
 {
     public class HediffCompProperties_LeaveAfterTicks : HediffCompProperties
     {
-        public int leaveAfterTicks = 1800000; // 30 RimWorld-Tage
+        public int leaveAfterTicks = 1800000; // 30 RimWorld days
 
         public HediffCompProperties_LeaveAfterTicks()
         {
@@ -15,7 +15,7 @@ namespace CreepjoinerTimeTraveler
     }
 
     /// <summary>
-    /// Wenn der Timer ablaeuft, verlaesst der Pawn die Kolonie und die Karte.
+    /// When the timer expires, the pawn leaves the colony and the map.
     /// </summary>
     public class HediffComp_LeaveAfterTicks : HediffComp
     {
@@ -54,10 +54,10 @@ namespace CreepjoinerTimeTraveler
                 if (pawn.MapHeld != null && pawn.Spawned)
                 {
                     Messages.Message(
-                        $"{pawn.LabelShort} verlaesst die Kolonie - so still wie er gekommen ist.",
+                        $"{pawn.LabelShort} leaves the colony - as quietly as he arrived.",
                         pawn, MessageTypeDefOf.NeutralEvent, historical: false);
 
-                    // Aus der Spielerfraktion entlassen, damit der Pawn frei abwandert.
+                    // Drop out of the player faction so the pawn wanders off freely.
                     if (pawn.Faction != null && pawn.Faction.IsPlayer)
                     {
                         pawn.SetFaction(null);
@@ -80,7 +80,7 @@ namespace CreepjoinerTimeTraveler
                 Log.Warning($"[CreepjoinerTimeTraveler] leave failed: {ex}");
             }
 
-            // Marker-Hediff entfernen, damit das hier nicht erneut feuert.
+            // Remove the marker hediff so this can't fire twice.
             pawn.health.RemoveHediff(parent);
         }
     }

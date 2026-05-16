@@ -8,9 +8,9 @@ using Verse;
 namespace CreepjoinerTimeTraveler
 {
     /// <summary>
-    /// Macht aus einem frisch generierten Creep-Joiner-Pawn eine 20-30 Jahre aeltere
-    /// Kopie eines zufaelligen Kolonisten: gleiches Geschlecht/Aussehen,
-    /// gleiche Narben und Augmentationen, anderer Name, Hightech-Outfit.
+    /// Turns a freshly generated creep-joiner pawn into a 20-30 year older
+    /// copy of a random colonist: same gender/appearance, same scars and
+    /// augmentations, different name, high-tech outfit.
     /// </summary>
     public static class TimeTravelerTransformer
     {
@@ -19,8 +19,8 @@ namespace CreepjoinerTimeTraveler
             var template = PickTemplateColonist(pawn);
             if (template == null)
             {
-                // Kein Kolonist gefunden - dann bleibt der Pawn unveraendert,
-                // damit das Event nicht in einen Fehler laeuft.
+                // No colonist found - leave the pawn unchanged so the event
+                // doesn't run into an error.
                 Log.Message("[CreepjoinerTimeTraveler] no colonist template available - skipping transform.");
                 return;
             }
@@ -56,7 +56,7 @@ namespace CreepjoinerTimeTraveler
             return pool.RandomElementWithFallback();
         }
 
-        // ---------- Aussehen ----------
+        // ---------- Appearance ----------
 
         private static void CopyAppearance(Pawn pawn, Pawn t)
         {
@@ -79,24 +79,24 @@ namespace CreepjoinerTimeTraveler
                 pawn.style.BodyTattoo = t.style.BodyTattoo;
             }
 
-            // Render-Refresh - defensiv, weil sich der Renderer zwischen RW-Versionen
-            // veraendert hat. Failt das, ist es nur ein kosmetisches Detail.
+            // Renderer refresh - defensive, because the renderer has shifted
+            // between RW versions. If it fails it's only a cosmetic detail.
             try { pawn.Drawer?.renderer?.SetAllGraphicsDirty(); } catch { }
             try { PortraitsCache.SetDirty(pawn); } catch { }
         }
 
-        // ---------- Gene (nur mit Biotech) ----------
+        // ---------- Genes (Biotech only) ----------
 
         private static void CopyGenes(Pawn pawn, Pawn t)
         {
             if (!ModsConfig.BiotechActive) return;
             if (pawn.genes == null || t.genes == null) return;
 
-            // Vorhandene Gene leeren.
+            // Clear existing genes.
             foreach (var g in pawn.genes.GenesListForReading.ToList())
                 pawn.genes.RemoveGene(g);
 
-            // Xenotyp-Label kopieren.
+            // Copy xenotype label.
             pawn.genes.SetXenotypeDirect(t.genes.Xenotype);
 
             foreach (var g in t.genes.Endogenes.ToList())
@@ -105,7 +105,7 @@ namespace CreepjoinerTimeTraveler
                 pawn.genes.AddGene(g.def, true);
         }
 
-        // ---------- Alter ----------
+        // ---------- Age ----------
 
         private static void BumpAge(Pawn pawn, Pawn t, DefModExtension_TimeTraveler ext)
         {
@@ -116,12 +116,13 @@ namespace CreepjoinerTimeTraveler
             pawn.ageTracker.AgeChronologicalTicks = t.ageTracker.AgeChronologicalTicks + offsetTicks;
         }
 
-        // ---------- Narben + Augmentationen ----------
+        // ---------- Scars + augmentations ----------
 
         private static void CopyMarkerHediffs(Pawn pawn, Pawn t)
         {
-            // Alles abnehmen, was als "Marker" gilt, vom Target Pawn entfernen wir nicht -
-            // die generierten Hediffs eines Creep-Joiners sind oft erwuenscht.
+            // Copy everything that counts as a "marker"; we don't strip anything
+            // from the target pawn - the generated hediffs of a creep-joiner
+            // are often desirable.
             foreach (var h in t.health.hediffSet.hediffs.ToList())
             {
                 bool isScar    = h is Hediff_Injury inj && inj.IsPermanent();
@@ -131,7 +132,7 @@ namespace CreepjoinerTimeTraveler
 
                 if (!isScar && !isAugment) continue;
 
-                // Passenden Body-Part am Ziel-Pawn finden (gleicher Def + gleicher Label-Index).
+                // Find the matching body part on the target pawn (same def + same label index).
                 BodyPartRecord targetPart = null;
                 if (h.Part != null)
                 {
@@ -171,7 +172,7 @@ namespace CreepjoinerTimeTraveler
             }
             catch
             {
-                // Fallback - falls die Namensgenerierung fuer den Xenotypen meckert.
+                // Fallback - in case name generation complains about the xenotype.
             }
         }
 
@@ -211,7 +212,7 @@ namespace CreepjoinerTimeTraveler
             }
         }
 
-        // ---------- Waffe ----------
+        // ---------- Weapon ----------
 
         private static void ReplaceWeapon(Pawn pawn, TechLevel minTech)
         {
@@ -219,7 +220,7 @@ namespace CreepjoinerTimeTraveler
             if (pawn.equipment.Primary != null)
                 pawn.equipment.DestroyEquipment(pawn.equipment.Primary);
 
-            // 40% Chance: keine Waffe - er wirkt entwaffnender.
+            // 40% chance: no weapon - he reads as less threatening.
             if (Rand.Chance(0.4f)) return;
 
             var pool = DefDatabase<ThingDef>.AllDefsListForReading
@@ -246,7 +247,7 @@ namespace CreepjoinerTimeTraveler
             var hediff = HediffMaker.MakeHediff(def, pawn);
             pawn.health.AddHediff(hediff);
 
-            // Falls die Def-Dauer ueberschrieben werden soll, hier anpassen.
+            // If the def-defined duration should be overridden, adjust here.
             var comp = hediff.TryGetComp<HediffComp_LeaveAfterTicks>();
             if (comp != null && ext.visitDurationDays > 0)
             {
