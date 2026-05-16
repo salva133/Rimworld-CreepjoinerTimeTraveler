@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>Creep Joiner: Time Traveler</name>
+  <name>An old friend</name>
   <packageId>steve.creepjoinertimetraveler</packageId>
   <author>Steve</author>
   <url></url>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Adds a new creep-joiner form: a time traveler who is secretly a 20-30 year older copy of one of your current colonists. He shares scars and augmentations with his younger self, wears random high-tech gear, has a randomized name and stays for 30 days before he leaves the colony again. He is harmless - the player only recognizes who he once was through the shared scars and bionics.
+  <description>A weathered drifter walks in from the edge of the map, asks for shelter, and stays a while before moving on. They will not say where they came from - but you may find something familiar about them, if you look closely enough.
 
-Requires the Anomaly DLC for the creep-joiner system.</description>
+Adds one new form to the Anomaly creep-joiner pool, alongside the vanilla ones.
+
+Requires the Anomaly DLC.</description>
   <modDependencies>
     <li>
       <packageId>Ludeon.RimWorld.Anomaly</packageId>
