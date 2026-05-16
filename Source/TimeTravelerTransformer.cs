@@ -9,11 +9,44 @@ namespace CreepjoinerTimeTraveler
 {
     /// <summary>
     /// Turns a freshly generated creep-joiner pawn into a 20-30 year older
-    /// copy of a random colonist: same gender/appearance, same scars and
-    /// augmentations, different name, high-tech outfit.
+    /// copy of a random colonist: same gender, appearance, genes, scars,
+    /// augmentations, traits, backstories, and skills (+5 each to model
+    /// extra years of experience). Name, apparel, and weapon are re-rolled.
+    /// Adds the Transcendence xenogene if Vanilla Races Expanded - Archons
+    /// is loaded.
+    ///
+    /// Pipeline order matters:
+    ///   1. Gender first (downstream systems branch on it).
+    ///   2. Genes BEFORE story colors. Adding a color-tone gene writes into
+    ///      story.hairColor / story.skinColorOverride during AddGene, so we
+    ///      must finish all gene operations before the explicit color writes.
+    ///   3. Story body/head/hair defs (plain fields with safe setters).
+    ///   4. Hair + skin colors via Traverse field writes - the vanilla
+    ///      property setters have side effects (SkinColorBase clears
+    ///      skinColorOverride) that silently undo any ordering we pick.
+    ///   5. Style (beard, tattoos).
+    ///   6. Transcendence xenogene (optional, gated on the def existing).
+    ///   7. Backstories first among the personality batch - they define
+    ///      disabled work tags that constrain skill writes.
+    ///   8. Traits next - can also disable skills.
+    ///   9. Skills last in the personality batch, so disables are in place.
+    ///  10. Scars + augmentations (hediffs).
+    ///  11. Age bump.
+    ///  12. Name, apparel, weapon.
+    ///  13. Visit timer hediff (also acts as the dedupe marker).
+    ///  14. Renderer refresh at the very end, after everything has settled.
+    ///  15. Flavor message into the message log.
     /// </summary>
     public static class TimeTravelerTransformer
     {
+        private const string TranscendenceGeneDefName = "VRE_Transcendent";
+
+        // Years of experience the time traveler has on his younger self -
+        // mechanically modelled as a flat skill bonus per skill, capped at
+        // the vanilla maximum (20).
+        private const int SkillBonus = 5;
+        private const int SkillMax = 20;
+
         public static void Apply(Pawn pawn, DefModExtension_TimeTraveler ext)
         {
             var template = PickTemplateColonist(pawn);
@@ -25,17 +58,71 @@ namespace CreepjoinerTimeTraveler
                 return;
             }
 
-            CopyAppearance(pawn, template);
+            Log.Message($"[CreepjoinerTimeTraveler] transforming {pawn.LabelShort} from template {template.LabelShort}");
+
+            // 1) Gender (must precede everything else - body type / hair / genes branch on it).
+            pawn.gender = template.gender;
+
+            // 2) Genes first - color-tone genes write into story during AddGene.
             CopyGenes(pawn, template);
-            BumpAge(pawn, template, ext);
+
+            // 3) Story body/head/hair defs (no color side effects on these).
+            CopyBodyAndHairDefs(pawn, template);
+
+            // 4) Explicit color writes via Traverse - bypass property setters
+            //    so SkinColorBase's setter does not wipe skinColorOverride.
+            CopyColors(pawn, template);
+
+            // 5) Style (beard, tattoos) - guarded for gender mismatch.
+            CopyStyle(pawn, template);
+
+            // 6) Optional Transcendence xenogene (Vanilla Races Expanded - Archons).
+            AddTranscendenceXenogene(pawn);
+
+            // 7) Backstories first - they define disabled work tags that
+            //    constrain which skills the SkillRecord setter accepts.
+            CopyBackstories(pawn, template);
+
+            // 8) Traits next - can also disable skills, and may be required
+            //    by backstories.
+            CopyTraits(pawn, template);
+
+            // 9) Skills last so backstory- and trait-derived disables are
+            //    already in place. Each skill gets +SkillBonus (clamped to
+            //    SkillMax) to represent extra years of experience.
+            CopySkillsWithBonus(pawn, template);
+
+            // 10) Scars and augmentations.
             CopyMarkerHediffs(pawn, template);
+
+            // 11) Age bump.
+            BumpAge(pawn, template, ext);
+
+            // 12) New name, gear, weapon.
             RandomizeName(pawn);
             ReplaceApparelHightech(pawn, ext.minTechLevel);
             ReplaceWeapon(pawn, ext.minTechLevel);
+
+            // 13) Visit timer.
             AttachVisitTimer(pawn, ext);
+
+            // 14) Refresh visuals after everything has been written.
+            RefreshVisuals(pawn);
+
+            // 15) Flavor message attached to the pawn so it shows in the
+            //     message log together with the vanilla arrival letter.
+            ShowArrivalMessage(pawn, template);
         }
 
         // ---------- Template ----------
+        //
+        // Template pool excludes colonists younger than MinTemplateAgeYears.
+        // Below that age the source pawn has no Adulthood backstory and a
+        // child-shaped body/head; copying any of that onto an adult time
+        // traveler would be inconsistent, so we filter them out at the
+        // selection step.
+
+        private const int MinTemplateAgeYears = 12;
 
         private static Pawn PickTemplateColonist(Pawn pawn)
         {
@@ -44,45 +131,96 @@ namespace CreepjoinerTimeTraveler
 
             if (map != null)
             {
-                pool = map.mapPawns.FreeColonistsSpawned
-                    .Where(p => p != null && !p.Dead && p.RaceProps.Humanlike);
+                pool = map.mapPawns.FreeColonistsSpawned.Where(IsEligibleTemplate);
             }
             if (pool == null || !pool.Any())
             {
-                pool = PawnsFinder.AllMaps_FreeColonists
-                    .Where(p => p != null && !p.Dead && p.RaceProps.Humanlike);
+                pool = PawnsFinder.AllMaps_FreeColonists.Where(IsEligibleTemplate);
             }
 
             return pool.RandomElementWithFallback();
         }
 
-        // ---------- Appearance ----------
-
-        private static void CopyAppearance(Pawn pawn, Pawn t)
+        private static bool IsEligibleTemplate(Pawn p)
         {
-            pawn.gender = t.gender;
+            if (p == null || p.Dead) return false;
+            if (p.RaceProps == null || !p.RaceProps.Humanlike) return false;
+            if (p.ageTracker == null) return false;
+            return p.ageTracker.AgeBiologicalYears >= MinTemplateAgeYears;
+        }
 
-            if (pawn.story != null && t.story != null)
+        // ---------- Body / head / hair defs ----------
+
+        private static void CopyBodyAndHairDefs(Pawn pawn, Pawn t)
+        {
+            if (pawn.story == null || t.story == null) return;
+
+            if (t.story.bodyType != null) pawn.story.bodyType = t.story.bodyType;
+            if (t.story.headType != null) pawn.story.headType = t.story.headType;
+            if (t.story.hairDef  != null) pawn.story.hairDef  = t.story.hairDef;
+        }
+
+        // ---------- Colors ----------
+        //
+        // Direct field writes via Traverse. The property setters in vanilla
+        // Pawn_StoryTracker have side effects (e.g. SkinColorBase resets
+        // skinColorOverride) which silently undo correct assignments
+        // depending on call order. Field writes bypass all of that; the
+        // final renderer refresh in RefreshVisuals() picks the new values up.
+
+        private static void CopyColors(Pawn pawn, Pawn t)
+        {
+            if (pawn.story == null || t.story == null) return;
+
+            try
             {
-                pawn.story.bodyType          = t.story.bodyType;
-                pawn.story.headType          = t.story.headType;
-                pawn.story.hairDef           = t.story.hairDef;
-                pawn.story.HairColor         = t.story.HairColor;
-                pawn.story.skinColorOverride = t.story.skinColorOverride;
-                pawn.story.SkinColorBase     = t.story.SkinColorBase;
+                var srcHair = Traverse.Create(t.story).Field("hairColor").GetValue<Color>();
+                Traverse.Create(pawn.story).Field("hairColor").SetValue(srcHair);
+            }
+            catch { /* defensive - if the field moved we just keep gene-based color */ }
+
+            try
+            {
+                var srcBase = Traverse.Create(t.story).Field("skinColorBase").GetValue<Color>();
+                Traverse.Create(pawn.story).Field("skinColorBase").SetValue(srcBase);
+            }
+            catch { }
+
+            try
+            {
+                var srcOverride = Traverse.Create(t.story).Field("skinColorOverride").GetValue<Color?>();
+                Traverse.Create(pawn.story).Field("skinColorOverride").SetValue(srcOverride);
+            }
+            catch { }
+
+            // Genes cache color tones. Tell the gene system to pick up the
+            // new values; otherwise the cached color from a previously
+            // resolved gene wins on the next render. NotifyColorsChanged
+            // exists at runtime but is hidden in the Krafs ref assembly, so
+            // we call it reflectively.
+            try
+            {
+                if (pawn.genes != null)
+                    Traverse.Create(pawn.genes).Method("NotifyColorsChanged").GetValue();
+            }
+            catch { }
+        }
+
+        // ---------- Style (beard, tattoos) ----------
+
+        private static void CopyStyle(Pawn pawn, Pawn t)
+        {
+            if (pawn.style == null || t.style == null) return;
+
+            // Beard only makes sense for matching gender; we already aligned
+            // gender, so this branch is mostly defensive against modded styles.
+            if (pawn.gender == t.gender && t.style.beardDef != null)
+            {
+                pawn.style.beardDef = t.style.beardDef;
             }
 
-            if (pawn.style != null && t.style != null)
-            {
-                pawn.style.beardDef   = t.style.beardDef;
-                pawn.style.FaceTattoo = t.style.FaceTattoo;
-                pawn.style.BodyTattoo = t.style.BodyTattoo;
-            }
-
-            // Renderer refresh - defensive, because the renderer has shifted
-            // between RW versions. If it fails it's only a cosmetic detail.
-            try { pawn.Drawer?.renderer?.SetAllGraphicsDirty(); } catch { }
-            try { PortraitsCache.SetDirty(pawn); } catch { }
+            if (t.style.FaceTattoo != null) pawn.style.FaceTattoo = t.style.FaceTattoo;
+            if (t.style.BodyTattoo != null) pawn.style.BodyTattoo = t.style.BodyTattoo;
         }
 
         // ---------- Genes (Biotech only) ----------
@@ -99,10 +237,120 @@ namespace CreepjoinerTimeTraveler
             // Copy xenotype label.
             pawn.genes.SetXenotypeDirect(t.genes.Xenotype);
 
+            // Order matters - vanilla resolves color tones in the order
+            // genes were added, with later genes winning. Preserve template
+            // order for both groups.
             foreach (var g in t.genes.Endogenes.ToList())
                 pawn.genes.AddGene(g.def, false);
             foreach (var g in t.genes.Xenogenes.ToList())
                 pawn.genes.AddGene(g.def, true);
+        }
+
+        // ---------- Transcendence xenogene ----------
+        //
+        // VRE_Transcendent is the gene def from Vanilla Races Expanded - Archons.
+        // GetNamedSilentFail keeps the code safe when that mod is uninstalled.
+
+        private static void AddTranscendenceXenogene(Pawn pawn)
+        {
+            if (!ModsConfig.BiotechActive) return;
+            if (pawn.genes == null) return;
+
+            var def = DefDatabase<GeneDef>.GetNamedSilentFail(TranscendenceGeneDefName);
+            if (def == null) return;
+
+            if (pawn.genes.GenesListForReading.Any(g => g.def == def))
+                return;
+
+            try
+            {
+                pawn.genes.AddGene(def, xenogene: true);
+                Log.Message($"[CreepjoinerTimeTraveler] added xenogene {def.defName} to {pawn.LabelShort}");
+            }
+            catch (System.Exception ex)
+            {
+                Log.Warning($"[CreepjoinerTimeTraveler] failed to add Transcendence gene: {ex.Message}");
+            }
+        }
+
+        // ---------- Backstories ----------
+
+        private static void CopyBackstories(Pawn pawn, Pawn t)
+        {
+            if (pawn.story == null || t.story == null) return;
+
+            try
+            {
+                pawn.story.Childhood = t.story.Childhood;
+                pawn.story.Adulthood = t.story.Adulthood;
+            }
+            catch (System.Exception ex)
+            {
+                Log.Warning($"[CreepjoinerTimeTraveler] backstory copy failed: {ex.Message}");
+            }
+        }
+
+        // ---------- Traits ----------
+        //
+        // Clear everything first, then re-add from the template. Some traits
+        // on the template might originate from genes; since we copy the same
+        // genes the gene system will re-apply those during AddGene, so going
+        // through TraitSet here and then deduping via def is safe.
+
+        private static void CopyTraits(Pawn pawn, Pawn t)
+        {
+            if (pawn.story?.traits == null || t.story?.traits == null) return;
+
+            foreach (var trait in pawn.story.traits.allTraits.ToList())
+            {
+                try { pawn.story.traits.RemoveTrait(trait); } catch { }
+            }
+
+            foreach (var srcTrait in t.story.traits.allTraits)
+            {
+                if (srcTrait?.def == null) continue;
+                if (pawn.story.traits.HasTrait(srcTrait.def)) continue;
+
+                try
+                {
+                    pawn.story.traits.GainTrait(new Trait(srcTrait.def, srcTrait.Degree, forced: false));
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Warning($"[CreepjoinerTimeTraveler] failed to add trait {srcTrait.def.defName}: {ex.Message}");
+                }
+            }
+        }
+
+        // ---------- Skills ----------
+        //
+        // Copy levels and passions, with a flat +SkillBonus on top. Skills
+        // disabled by backstory or trait silently stay at zero - SkillRecord
+        // accepts the assignment but TotallyDisabled blocks the use.
+
+        private static void CopySkillsWithBonus(Pawn pawn, Pawn t)
+        {
+            if (pawn.skills == null || t.skills == null) return;
+
+            foreach (var src in t.skills.skills)
+            {
+                if (src?.def == null) continue;
+                var dst = pawn.skills.GetSkill(src.def);
+                if (dst == null) continue;
+
+                int newLevel = Mathf.Clamp(src.Level + SkillBonus, 0, SkillMax);
+
+                try
+                {
+                    dst.Level = newLevel;
+                    dst.passion = src.passion;
+                    dst.xpSinceLastLevel = src.xpSinceLastLevel;
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Warning($"[CreepjoinerTimeTraveler] failed to set skill {src.def.defName}: {ex.Message}");
+                }
+            }
         }
 
         // ---------- Age ----------
@@ -253,6 +501,48 @@ namespace CreepjoinerTimeTraveler
             {
                 Traverse.Create(comp).Field("ticksLeft").SetValue(ext.visitDurationDays * 60000);
             }
+        }
+
+        // ---------- Flavor message ----------
+        //
+        // Picked from a small pool of in-character observations the colony
+        // could plausibly make on first sight. The text hints at the
+        // time-travel angle without naming it - the player should notice
+        // the resemblance over time, not be told outright.
+
+        private static readonly string[] ArrivalFlavorTemplates =
+        {
+            "{0} carries themselves like a colonist - but older. Much older.",
+            "Something about the way {0} moves through camp feels rehearsed, as if they have walked it before.",
+            "{0}'s scars sit in shapes and places you swear you have seen on someone else.",
+            "{0} flinches at a name that was never called - then catches themselves.",
+            "{0} watches the colony with eyes that already know where everyone sleeps.",
+            "{0} answers a question before it is finished, then pretends not to have heard it.",
+        };
+
+        private static void ShowArrivalMessage(Pawn pawn, Pawn template)
+        {
+            try
+            {
+                var line = ArrivalFlavorTemplates.RandomElement();
+                var text = string.Format(line, pawn.LabelShort);
+                Messages.Message(text, pawn, MessageTypeDefOf.NeutralEvent, historical: true);
+            }
+            catch (System.Exception ex)
+            {
+                Log.Warning($"[CreepjoinerTimeTraveler] arrival flavor message failed: {ex.Message}");
+            }
+        }
+
+        // ---------- Visual refresh ----------
+        //
+        // Renderer internals shifted between 1.4 / 1.5 / 1.6; keep each call
+        // in its own try/catch so a missing API does not cancel the others.
+
+        private static void RefreshVisuals(Pawn pawn)
+        {
+            try { pawn.Drawer?.renderer?.SetAllGraphicsDirty(); } catch { }
+            try { PortraitsCache.SetDirty(pawn); } catch { }
         }
     }
 }
