@@ -505,19 +505,20 @@ namespace CreepjoinerTimeTraveler
 
         // ---------- Flavor message ----------
         //
-        // Picked from a small pool of in-character observations the colony
-        // could plausibly make on first sight. The text hints at the
-        // time-travel angle without naming it - the player should notice
-        // the resemblance over time, not be told outright.
+        // A small pool of plain observations - things the colony might
+        // plausibly notice about a new arrival, without drawing any
+        // conclusion. The aim is texture, not explanation; players who
+        // catch the resemblance to one of their own colonists should
+        // arrive at it themselves.
 
         private static readonly string[] ArrivalFlavorTemplates =
         {
-            "{0} carries themselves like a colonist - but older. Much older.",
-            "Something about the way {0} moves through camp feels rehearsed, as if they have walked it before.",
-            "{0}'s scars sit in shapes and places you swear you have seen on someone else.",
-            "{0} flinches at a name that was never called - then catches themselves.",
-            "{0} watches the colony with eyes that already know where everyone sleeps.",
-            "{0} answers a question before it is finished, then pretends not to have heard it.",
+            "{0} settles in without asking which bunk is free.",
+            "{0} pauses at the kitchen, as if looking for something that isn't there.",
+            "{0} takes the long way around the workbench, then doubles back.",
+            "{0} watches the colony with the quiet of someone with nowhere else to be.",
+            "{0} stops sometimes, as if listening for something the others can't hear.",
+            "{0} hums something tuneless while they work - none of you know the song.",
         };
 
         private static void ShowArrivalMessage(Pawn pawn, Pawn template)
