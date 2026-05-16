@@ -8,7 +8,7 @@
     versions. This config only uses the reliably present base fields; the rest
     (appearance override etc.) happens inside the C# patch.
   -->
-  <CreepJoinerFormKindDef>
+  <CreepJoinerFormKindDef ParentName="BaseCreepJoinerKind">
     <defName>CTT_TimeTraveler</defName>
     <label>time traveler</label>
     <description>A drifter in strange, ageing gear. There is something unsettlingly familiar about them - old scars and augmentations that you swear you have seen before. They claim to come from far away. They are quiet, withdrawn, and ask to stay a while.</description>
