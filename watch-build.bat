@@ -27,8 +27,9 @@ if errorlevel 1 (
 echo [watch-build] Watching Source\*.cs - press Ctrl+C to stop.
 echo.
 
-dotnet watch build -c Release
+@REM dotnet watch build -c Release
+dotnet build -c Release
 
 echo.
 echo [watch-build] watcher exited.
-pause
+@REM pause
