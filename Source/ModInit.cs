@@ -6,7 +6,7 @@ namespace CreepjoinerTimeTraveler
     [StaticConstructorOnStartup]
     public static class ModInit
     {
-        public const string HarmonyId = "steve.creepjoinertimetraveler";
+        public const string HarmonyId = "donsantana.creepjoiners.timetraveler";
 
         static ModInit()
         {
