@@ -12,7 +12,7 @@ namespace CreepjoinerTimeTraveler
         {
             var harmony = new Harmony(HarmonyId);
             harmony.PatchAll();
-            Patch_IncidentWorker_CreepJoinerJoin.Install(harmony);
+            Patch_CreepJoinerUtility.Install(harmony);
             Log.Message("[CreepjoinerTimeTraveler] initialized");
         }
     }
