@@ -14,7 +14,7 @@
     <defName>CTT_Familiar</defName>
     <label>familiar</label>
     <labelFemale>familiar</labelFemale>
-    <inverse>CTT_Familiar</inverse>
+    <reflexive>true</reflexive>
     <importance>5</importance>
   </PawnRelationDef>
 
