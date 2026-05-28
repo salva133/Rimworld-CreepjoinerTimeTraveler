@@ -1,6 +1,6 @@
 @echo off
 REM ----------------------------------------------------------------------
-REM  CreepjoinerTimeTraveler - dotnet watch build
+REM  dotnet watch build
 REM
 REM  Starts a file watcher on Source\*.cs that triggers an incremental
 REM  Release build whenever a C# file is saved. Build output drops into
@@ -15,7 +15,7 @@ REM  a live game will fail with "file in use" - close RimWorld first or
 REM  ignore those failed builds and let the next one succeed.
 REM ----------------------------------------------------------------------
 
-title CreepjoinerTimeTraveler - dotnet watch build
+title dotnet watch build
 
 cd /d "%~dp0Source"
 if errorlevel 1 (
