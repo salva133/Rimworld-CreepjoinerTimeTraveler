@@ -66,4 +66,4 @@ NOTES.local.md
 /release/
 *.zip
 CLAUDE.md
-**\Assemblies\**.dll
+*.dll
